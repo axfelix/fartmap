@@ -108,7 +108,7 @@ states.then(function(json) {
 			return stateElements = document.getElementsByTagName("path");
 		}).then(function (stateElements) {
 			for (var i = 0; i < stateElements.length; i++) { stateElements[i].addEventListener("mouseover", fart); }
-			for (var i = 0; i < stateElements.length; i++) { stateElements[i].addEventListener("touchmove", fart); }
+			for (var i = 0; i < stateElements.length; i++) { stateElements[i].addEventListener("touchstart", fart); }
 		})
 
 </script>
