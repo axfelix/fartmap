@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://d3js.org/d3.v6.min.js"></script>
 <style type="text/css">
 
 path:hover {
@@ -70,8 +70,11 @@ document.onkeydown = function(e) {
 var width = 960;
 var height = 500;
 
-var lowColor = '#f9f9f9'
+var lowColor = '#f9f2e9'
 var highColor = '#662200'
+var ramp = d3.scaleLinear()
+	.domain([0, 20])
+	.range([lowColor, highColor])
 
 var projection = d3.geoAlbersUsa()
     .translate([width / 2, height / 2])
@@ -85,60 +88,28 @@ var svg = d3.select("body")
     .attr("width", width)
     .attr("height", height);
 
-var q = d3.queue();
-
-d3.csv("statesdata.csv", function(data) {
-    var dataArray = [];
-    for (var d = 0; d < data.length; d++) {
-        dataArray.push(parseFloat(Math.random() * 20))
-    }
-    var minVal = d3.min(dataArray)
-    var maxVal = d3.max(dataArray)
-    // would like to randomize rather than hardcode states
-    var ramp = d3.scaleLinear().domain([minVal, maxVal]).range([lowColor, highColor])
-
-    d3.json("us-states.json", function(json) {
-        for (var i = 0; i < data.length; i++) {
-            var dataState = data[i].state;
-            var dataValue = data[i].value;
-            for (var j = 0; j < json.features.length; j++) {
-                var jsonState = json.features[j].properties.name;
-                if (dataState == jsonState) {
-                    json.features[j].properties.value = dataValue;
-                    break;
-                }
-            }
-        }
-
-        svg.selectAll("path")
-            .data(json.features)
-            .enter()
-            .append("path")
-            .attr("d", path)
-            .attr("id", function(d) {
-                return d.properties.name
-            })
-            .style("stroke", "#fff")
-            .style("stroke-width", "1")
-            .style("fill", function(d) {
-                return ramp(d.properties.value)
-            });
-    });
-});
-
-function registerFarts(callback) {
-	setTimeout(function() {
-		var states = document.getElementsByTagName("path");
-		for (var i = 0; i < states.length; i++) { states[i].addEventListener("mouseover", fart); }
-		for (var i = 0; i < states.length; i++) { states[i].addEventListener("touchmove", fart); }
-		callback(null);
-	}, 500);
-}
-
-q.defer(registerFarts);
-q.await(function(error) {
-  if (error) throw error;
-});
+const states = d3.json("us-states.json");
+states.then(function(json) {
+	return data =
+	    svg.selectAll("path")
+	        .data(json.features)
+	        .enter()
+	        .append("path")
+	        .attr("d", path)
+	        .attr("id", function(j) {
+	            return j.properties.name
+	        })
+	        .style("stroke", "#fff")
+	        .style("stroke-width", "1")
+	        .style("fill", function() {
+	            return ramp(parseFloat(Math.random() * 20))
+	        });
+		}).then(function (data) {
+			return stateElements = document.getElementsByTagName("path");
+		}).then(function (stateElements) {
+			for (var i = 0; i < stateElements.length; i++) { stateElements[i].addEventListener("mouseover", fart); }
+			for (var i = 0; i < stateElements.length; i++) { stateElements[i].addEventListener("touchmove", fart); }
+		})
 
 </script>
 </body>
